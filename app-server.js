@@ -1,9 +1,10 @@
 var express = require('express')
-
-let connections = []
-
 // usable instance of an express app
 let app = express()
+
+let connections = []
+let title = 'Untitled Presentation'
+
 
 // server files from static public dir
 app.use(express.static('./public'))
@@ -15,7 +16,7 @@ let server = app.listen(3000)
 // socket server to also listen on port 3000
 let io = require('socket.io').listen(server)
 
-// event hanler for socket connect
+// event handler for socket connect
 io.sockets.on('connection', (socket) => {
 
 	// handle disconnection
@@ -25,6 +26,10 @@ io.sockets.on('connection', (socket) => {
 		console.log("Disconnected: %s sockets remaining.", connections.length)
 	})
 
+	// throw 'title' info to client
+	socket.emit('welcome', {
+		title: title
+	})
 
 	connections.push(socket) // add connected socket to list
 	console.log("Connected: %s sockets connected", connections.length)

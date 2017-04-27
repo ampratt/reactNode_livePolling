@@ -21818,7 +21818,8 @@
 		displayName: 'App',
 		getInitialState: function getInitialState() {
 			return {
-				status: 'disconnected'
+				status: 'disconnected',
+				title: ''
 			};
 		},
 		componentWillMount: function componentWillMount() {
@@ -21826,6 +21827,7 @@
 			// listener for connect event
 			this.socket.on('connect', this.connect);
 			this.socket.on('disconnect', this.disconnect);
+			this.socket.on('welcome', this.welcome);
 		},
 		connect: function connect() {
 			// alert("Connected: " + this.socket.id)
@@ -21840,12 +21842,17 @@
 				status: 'disconnected'
 			});
 		},
+		welcome: function welcome(serverState) {
+			this.setState({
+				title: serverState.title
+			});
+		},
 		render: function render() {
 			return _react2.default.createElement(
 				'div',
 				null,
 				_react2.default.createElement(_Header2.default, {
-					title: 'New Header',
+					title: this.state.title,
 					status: this.state.status
 				})
 			);
