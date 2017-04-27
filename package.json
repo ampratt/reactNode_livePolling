@@ -21,7 +21,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "prestart": "node_modules/.bin/webpack",
+    "prestart": "./node_modules/.bin/webpack",
     "start": "node app-server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
