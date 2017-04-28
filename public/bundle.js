@@ -27798,7 +27798,8 @@
 		getInitialState: function getInitialState() {
 			return {
 				status: 'disconnected',
-				title: ''
+				title: '',
+				member: {}
 			};
 		},
 
@@ -27810,6 +27811,7 @@
 			this.socket.on('connect', this.connect);
 			this.socket.on('disconnect', this.disconnect);
 			this.socket.on('welcome', this.welcome);
+			this.socket.on('joined', this.joined);
 		},
 
 
@@ -27834,6 +27836,11 @@
 		welcome: function welcome(serverState) {
 			this.setState({
 				title: serverState.title
+			});
+		},
+		joined: function joined(member) {
+			this.setState({
+				member: member
 			});
 		},
 		render: function render() {
@@ -36480,8 +36487,6 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	// import PropTypes from 'prop-types';
-
 	var Audience = function (_Component) {
 		_inherits(Audience, _Component);
 
@@ -36501,11 +36506,30 @@
 						_Display2.default,
 						{ 'if': this.props.status === 'connected' },
 						_react2.default.createElement(
-							'h1',
-							null,
-							'Join the session'
+							_Display2.default,
+							{ 'if': this.props.member.name },
+							_react2.default.createElement(
+								'h2',
+								null,
+								'Welcome ',
+								this.props.member.name
+							),
+							_react2.default.createElement(
+								'p',
+								null,
+								'Questions will appear below.'
+							)
 						),
-						_react2.default.createElement(_Join2.default, { emit: this.props.emit })
+						_react2.default.createElement(
+							_Display2.default,
+							{ 'if': !this.props.member.name },
+							_react2.default.createElement(
+								'h1',
+								null,
+								'Join the session'
+							),
+							_react2.default.createElement(_Join2.default, { emit: this.props.emit })
+						)
 					)
 				);
 			}
@@ -36556,15 +36580,7 @@
 					'div',
 					null,
 					this.props.children
-				) : _react2.default.createElement(
-					'div',
-					null,
-					_react2.default.createElement(
-						'h2',
-						null,
-						'Waiting for connection'
-					)
-				);
+				) : null;
 			}
 		}]);
 
@@ -36572,6 +36588,10 @@
 	}(_react.Component);
 
 	exports.default = Display;
+
+	// return (this.props.if) ? 
+	// 	<div>{this.props.children}</div> : 
+	// 	<div><h2>Waiting for connection</h2></div>;
 
 /***/ }),
 /* 299 */

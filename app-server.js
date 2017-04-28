@@ -27,6 +27,13 @@ io.sockets.on('connection', (socket) => {
 	})
 
 	socket.on('join', (payload) => {
+		// 'this' refers to current socket
+		let newMember = {
+			id: this,
+			name: payload.name
+		}
+		// respond to client
+		io.emit('joined', newMember)
 		console.log("Audience Joined: %s", payload.name)
 	})
 

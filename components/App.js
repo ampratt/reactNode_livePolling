@@ -10,6 +10,7 @@ const App = React.createClass({
 		return {
 			status: 'disconnected',
 			title: '',
+			member: {}
 		}
 	},
 
@@ -20,6 +21,7 @@ const App = React.createClass({
 		this.socket.on('connect', this.connect)
 		this.socket.on('disconnect', this.disconnect)
 		this.socket.on('welcome', this.welcome)
+		this.socket.on('joined', this.joined)
 	},
 
 	// all outgoing data TO server comes through emit()
@@ -46,6 +48,12 @@ const App = React.createClass({
 	welcome(serverState) {
 		this.setState({
 			title: serverState.title
+		})
+	},
+
+	joined(member) {
+		this.setState({
+			member: member
 		})
 	},
 
