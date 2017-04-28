@@ -1,4 +1,5 @@
 import React from 'react'
+import { Router, RouteHandler } from 'react-router'
 import io from 'socket.io-client'
 import Header from './parts/Header'
 
@@ -8,7 +9,8 @@ const App = React.createClass({
 	getInitialState() {
 		return {
 			status: 'disconnected',
-			title: ''
+			title: '',
+			dance: 'yes please'
 		}
 	},
 
@@ -42,15 +44,31 @@ const App = React.createClass({
 	},
 
 	render(){
+		// var children = React.Children.map(this.props.children, function (child) {
+	  //   return React.cloneElement(child, {
+	  //     foo: this.state.foo
+	  //   })
+	  // })
+  	    let childrenWithProps = React.cloneElement(
+  	    	this.props.children, 
+  	    	{...this.state}
+  	    	// {
+  	    	// 	title: this.state.title,
+  	    	// 	status: this.state.status
+  	    	// }
+    	)
+
 		return (
 			<div>
 				<Header 
 					title={this.state.title}
 					status={this.state.status} 
 				/>
+			{childrenWithProps}
 			</div>
 		)
 	}
 })
 
-module.exports = App
+export default App
+// module.exports = App

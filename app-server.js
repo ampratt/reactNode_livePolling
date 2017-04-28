@@ -1,6 +1,6 @@
-var express = require('express')
+const express = require('express')
 // usable instance of an express app
-let app = express()
+const app = express()
 
 let connections = []
 let title = 'Untitled Presentation'
@@ -35,4 +35,4 @@ io.sockets.on('connection', (socket) => {
 	console.log("Connected: %s sockets connected", connections.length)
 })
 
-console.log("Polling server is running at 'http://localhost:3000'")
+console.log("Express polling server is running at 'http://localhost:3000'")

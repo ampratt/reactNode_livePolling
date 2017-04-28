@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 
-class Header extends Component {
+const Header = React.createClass({
 
 	getDefaultProps() {
 		return {
 			status: 'disconnected'
 		}
-	}
+	},
 
 	render() {
 		return (
@@ -21,7 +21,7 @@ class Header extends Component {
 			</header>
 		)	
 	}
-}
+})
 
 Header.propTypes = {
 	title: PropTypes.string.isRequired,

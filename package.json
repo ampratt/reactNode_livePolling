@@ -15,14 +15,18 @@
     "eslint-plugin-react": "^6.4.0",
     "express": "^4.15.2",
     "react": "^15.5.4",
+    "react-router": "^3.0.2",
     "socket.io": "^1.7.3",
     "socket.io-client": "^1.7.3",
     "webpack": "^1.13.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  },
   "scripts": {
     "prestart": "./node_modules/.bin/webpack",
     "start": "node app-server.js",
+    "run": "node app-server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Aaron Pratt, Alex Banks",
