@@ -27823,7 +27823,12 @@
 			console.log("Person joined ", payload.name);
 		},
 		connect: function connect() {
-			// alert("Connected: " + this.socket.id)
+			// see if pre-existing person already exists in sessionStorage
+			var member = sessionStorage.member ? JSON.parse(sessionStorage.member) : null;
+			if (member) {
+				this.emit('join', member);
+			}
+
 			console.log("Connected: " + this.socket.id);
 			this.setState({
 				status: 'connected'
@@ -27841,6 +27846,8 @@
 			});
 		},
 		joined: function joined(member) {
+			// save in local session to allow auto rejoin same member on browser refresh
+			sessionStorage.member = JSON.stringify(member);
 			this.setState({
 				member: member
 			});
