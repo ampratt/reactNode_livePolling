@@ -72,7 +72,7 @@
 
 	var _Speaker2 = _interopRequireDefault(_Speaker);
 
-	var _Board = __webpack_require__(301);
+	var _Board = __webpack_require__(303);
 
 	var _Board2 = _interopRequireDefault(_Board);
 
@@ -27738,11 +27738,11 @@
 
 	var _Speaker2 = _interopRequireDefault(_Speaker);
 
-	var _Board = __webpack_require__(301);
+	var _Board = __webpack_require__(303);
 
 	var _Board2 = _interopRequireDefault(_Board);
 
-	var _Whoops = __webpack_require__(302);
+	var _Whoops = __webpack_require__(304);
 
 	var _Whoops2 = _interopRequireDefault(_Whoops);
 
@@ -27799,8 +27799,9 @@
 			return {
 				status: 'disconnected',
 				title: '',
-				member: {},
-				audience: []
+				member: {}, // refers to current socket
+				audience: [],
+				speaker: ''
 			};
 		},
 
@@ -27808,12 +27809,13 @@
 		// all incoming data FROM server added to listeners
 		componentWillMount: function componentWillMount() {
 			this.socket = (0, _socket2.default)('http://localhost:3000');
-			// listener for connect event
 			this.socket.on('connect', this.connect);
 			this.socket.on('disconnect', this.disconnect);
-			this.socket.on('welcome', this.welcome);
+			this.socket.on('welcome', this.updateState);
 			this.socket.on('joined', this.joined);
 			this.socket.on('audience', this.updateAudience);
+			this.socket.on('start', this.startPresentation);
+			this.socket.on('end', this.updateState);
 		},
 
 
@@ -27825,8 +27827,15 @@
 		connect: function connect() {
 			// see if pre-existing person already exists in sessionStorage
 			var member = sessionStorage.member ? JSON.parse(sessionStorage.member) : null;
-			if (member) {
+
+			if (member && member.type === 'audience') {
 				this.emit('join', member);
+			} else if (member && member.type === 'speaker') {
+				// automatically rejoin speaker on socket refresh
+				this.emit('start', {
+					name: member.name,
+					title: sessionStorage.title
+				});
 			}
 
 			console.log("Connected: " + this.socket.id);
@@ -27837,13 +27846,13 @@
 		disconnect: function disconnect() {
 			console.log("Disconnected: " + this.socket.id);
 			this.setState({
-				status: 'disconnected'
+				status: 'disconnected',
+				title: 'disconnected',
+				speaker: ''
 			});
 		},
-		welcome: function welcome(serverState) {
-			this.setState({
-				title: serverState.title
-			});
+		updateState: function updateState(serverState) {
+			this.setState(serverState);
 		},
 		joined: function joined(member) {
 			// save in local session to allow auto rejoin same member on browser refresh
@@ -27854,6 +27863,12 @@
 		},
 		updateAudience: function updateAudience(newAudience) {
 			this.setState({ audience: newAudience });
+		},
+		startPresentation: function startPresentation(presentation) {
+			if (this.state.member.type === 'speaker') {
+				sessionStorage.title = presentation.title;
+			}
+			this.setState(presentation);
 		},
 		render: function render() {
 			// var children = React.Children.map(this.props.children, function (child) {
@@ -27868,10 +27883,7 @@
 			return _react2.default.createElement(
 				'div',
 				null,
-				_react2.default.createElement(_Header2.default, {
-					title: this.state.title,
-					status: this.state.status
-				}),
+				_react2.default.createElement(_Header2.default, this.state),
 				childrenWithProps
 			);
 		}
@@ -36450,6 +36462,12 @@
 						'h1',
 						null,
 						this.props.title
+					),
+					_react2.default.createElement(
+						'h3',
+						null,
+						'Speaker name: ',
+						this.props.speaker
 					)
 				),
 				_react2.default.createElement(
@@ -36625,6 +36643,8 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _reactRouter = __webpack_require__(182);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Join = _react2.default.createClass({
@@ -36633,9 +36653,6 @@
 			var member = {
 				memberName: this.refs.name.value //React.findDOMNode(this.refs.name).value
 			};
-			//prevent JS reload and sending info to server
-			// e.preventDefault();
-			// alert("TODO: Join member " + member.memberName)
 			this.props.emit('join', { name: member.memberName });
 		},
 		render: function render() {
@@ -36655,6 +36672,11 @@
 					'button',
 					{ className: 'btn btn-primary' },
 					'Join'
+				),
+				_react2.default.createElement(
+					_reactRouter.Link,
+					{ to: '/speaker' },
+					'Start a Presentation'
 				)
 			);
 		}
@@ -36678,6 +36700,18 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _Display = __webpack_require__(298);
+
+	var _Display2 = _interopRequireDefault(_Display);
+
+	var _JoinSpeaker = __webpack_require__(301);
+
+	var _JoinSpeaker2 = _interopRequireDefault(_JoinSpeaker);
+
+	var _Attendance = __webpack_require__(302);
+
+	var _Attendance2 = _interopRequireDefault(_Attendance);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -36685,8 +36719,6 @@
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	// import PropTypes from 'prop-types';
 
 	var Speaker = function (_Component) {
 		_inherits(Speaker, _Component);
@@ -36701,10 +36733,32 @@
 			key: 'render',
 			value: function render() {
 				return _react2.default.createElement(
-					'h1',
+					'div',
 					null,
-					'Speaker : ',
-					this.props.status
+					_react2.default.createElement(
+						_Display2.default,
+						{ 'if': this.props.status === 'connected' },
+						_react2.default.createElement(
+							_Display2.default,
+							{ 'if': this.props.member.name && this.props.member.type === 'speaker' },
+							_react2.default.createElement(
+								'p',
+								null,
+								'Questions'
+							),
+							_react2.default.createElement(_Attendance2.default, { audience: this.props.audience })
+						),
+						_react2.default.createElement(
+							_Display2.default,
+							{ 'if': !this.props.member.name },
+							_react2.default.createElement(
+								'h2',
+								null,
+								'Start a Presentation'
+							),
+							_react2.default.createElement(_JoinSpeaker2.default, { emit: this.props.emit })
+						)
+					)
 				);
 			}
 		}]);
@@ -36716,6 +36770,169 @@
 
 /***/ }),
 /* 301 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(36);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var JoinSpeaker = _react2.default.createClass({
+		displayName: 'JoinSpeaker',
+		start: function start(e) {
+			var speakerName = this.refs.name.value;
+			var title = this.refs.title.value;
+			this.props.emit('start', {
+				name: speakerName,
+				title: title
+			});
+		},
+		render: function render() {
+			return _react2.default.createElement(
+				'form',
+				{ action: 'javascript:void(0)', onSubmit: this.start },
+				_react2.default.createElement(
+					'label',
+					null,
+					'Full Name'
+				),
+				_react2.default.createElement('input', { ref: 'name',
+					className: 'form-control',
+					placeholder: 'enter your full name...',
+					required: true }),
+				_react2.default.createElement(
+					'label',
+					null,
+					'presentation Title'
+				),
+				_react2.default.createElement('input', { ref: 'title',
+					className: 'form-control',
+					placeholder: 'enter title for presentation...',
+					required: true }),
+				_react2.default.createElement(
+					'button',
+					{ className: 'btn btn-primary' },
+					'Start'
+				)
+			);
+		}
+	});
+
+	exports.default = JoinSpeaker;
+
+/***/ }),
+/* 302 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Attendance = function (_Component) {
+		_inherits(Attendance, _Component);
+
+		function Attendance() {
+			_classCallCheck(this, Attendance);
+
+			return _possibleConstructorReturn(this, (Attendance.__proto__ || Object.getPrototypeOf(Attendance)).apply(this, arguments));
+		}
+
+		_createClass(Attendance, [{
+			key: "addMemberRow",
+			value: function addMemberRow(member, i) {
+				return _react2.default.createElement(
+					"tr",
+					{ key: i },
+					_react2.default.createElement(
+						"td",
+						null,
+						member.name
+					),
+					_react2.default.createElement(
+						"td",
+						null,
+						member.id
+					)
+				);
+			}
+		}, {
+			key: "render",
+			value: function render() {
+				return _react2.default.createElement(
+					"div",
+					{ className: "" },
+					_react2.default.createElement(
+						"h2",
+						null,
+						"Attendance - ",
+						this.props.audience.length,
+						" members"
+					),
+					_react2.default.createElement(
+						"table",
+						{ className: "table table-striped" },
+						_react2.default.createElement(
+							"thead",
+							null,
+							_react2.default.createElement(
+								"tr",
+								null,
+								_react2.default.createElement(
+									"th",
+									null,
+									"Audience Member"
+								),
+								_react2.default.createElement(
+									"th",
+									null,
+									"Socket Id"
+								)
+							)
+						),
+						_react2.default.createElement(
+							"tbody",
+							null,
+							this.props.audience.map(this.addMemberRow)
+						)
+					)
+				);
+			}
+		}]);
+
+		return Attendance;
+	}(_react.Component);
+
+	exports.default = Attendance;
+
+/***/ }),
+/* 303 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -36767,7 +36984,7 @@
 	exports.default = Board;
 
 /***/ }),
-/* 302 */
+/* 304 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';

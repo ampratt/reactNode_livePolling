@@ -10,20 +10,22 @@ const App = React.createClass({
 		return {
 			status: 'disconnected',
 			title: '',
-			member: {},
-			audience: []
+			member: {},		// refers to current socket
+			audience: [],
+			speaker: ''
 		}
 	},
 
 	// all incoming data FROM server added to listeners
 	componentWillMount() {
 		this.socket = io('http://localhost:3000')
-		// listener for connect event
 		this.socket.on('connect', this.connect)
 		this.socket.on('disconnect', this.disconnect)
-		this.socket.on('welcome', this.welcome)
+		this.socket.on('welcome', this.updateState)
 		this.socket.on('joined', this.joined)
 		this.socket.on('audience', this.updateAudience)
+		this.socket.on('start', this.startPresentation)
+		this.socket.on('end', this.updateState)
 	},
 
 	// all outgoing data TO server comes through emit()
@@ -35,8 +37,15 @@ const App = React.createClass({
 	connect() {
 		// see if pre-existing person already exists in sessionStorage
 		let member = (sessionStorage.member) ? JSON.parse(sessionStorage.member) : null
-		if (member) {
-			this.emit('join', member)
+		
+        if (member && member.type === 'audience') {
+            this.emit('join', member);
+        } else if (member && member.type === 'speaker') {
+			// automatically rejoin speaker on socket refresh
+			this.emit('start', { 
+				name: member.name, 
+				title: sessionStorage.title
+			})
 		}
 
 		console.log("Connected: " + this.socket.id)
@@ -48,14 +57,14 @@ const App = React.createClass({
 	disconnect() {
 		console.log("Disconnected: " + this.socket.id)
 		this.setState({
-			status: 'disconnected'
+			status: 'disconnected',
+			title: 'disconnected',
+			speaker: ''
 		}) 
 	},
 
-	welcome(serverState) {
-		this.setState({
-			title: serverState.title
-		})
+	updateState(serverState) {
+		this.setState(serverState)
 	},
 
 	joined(member) {
@@ -68,6 +77,13 @@ const App = React.createClass({
 
 	updateAudience(newAudience) {
 		this.setState({ audience: newAudience })
+	},
+
+	startPresentation(presentation) {
+		if (this.state.member.type === 'speaker') {
+			sessionStorage.title = presentation.title
+		}
+		this.setState(presentation)
 	},
 
 	render(){
@@ -85,11 +101,8 @@ const App = React.createClass({
 
 		return (
 			<div>
-				<Header 
-					title={this.state.title}
-					status={this.state.status} 
-				/>
-			{childrenWithProps}
+				<Header {...this.state} />
+				{childrenWithProps}
 			</div>
 		)
 	}
