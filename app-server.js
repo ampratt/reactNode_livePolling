@@ -26,6 +26,10 @@ io.sockets.on('connection', (socket) => {
 		console.log("Disconnected: %s sockets remaining.", connections.length)
 	})
 
+	socket.on('join', (payload) => {
+		console.log("Audience Joined: %s", payload.name)
+	})
+
 	// throw 'title' info to client
 	socket.emit('welcome', {
 		title: title
