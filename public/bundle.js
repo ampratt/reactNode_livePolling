@@ -27799,7 +27799,8 @@
 			return {
 				status: 'disconnected',
 				title: '',
-				member: {}
+				member: {},
+				audience: []
 			};
 		},
 
@@ -27812,6 +27813,7 @@
 			this.socket.on('disconnect', this.disconnect);
 			this.socket.on('welcome', this.welcome);
 			this.socket.on('joined', this.joined);
+			this.socket.on('audience', this.updateAudience);
 		},
 
 
@@ -27842,6 +27844,9 @@
 			this.setState({
 				member: member
 			});
+		},
+		updateAudience: function updateAudience(newAudience) {
+			this.setState({ audience: newAudience });
 		},
 		render: function render() {
 			// var children = React.Children.map(this.props.children, function (child) {
@@ -36513,6 +36518,12 @@
 								null,
 								'Welcome ',
 								this.props.member.name
+							),
+							_react2.default.createElement(
+								'p',
+								{ className: 'info-update' },
+								this.props.audience.length,
+								' audience members connected'
 							),
 							_react2.default.createElement(
 								'p',

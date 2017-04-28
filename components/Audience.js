@@ -10,6 +10,7 @@ class Audience extends Component {
 
 					<Display if={this.props.member.name}>
 						<h2>Welcome {this.props.member.name}</h2>
+						<p className="info-update">{this.props.audience.length} audience members connected</p>
 						<p>Questions will appear below.</p>
 					</Display>
 
