@@ -21,6 +21,7 @@ const Join = React.createClass ({
 						required />
 				<button className="btn btn-primary">Join</button>
 				<Link to="/speaker">Start a Presentation</Link>
+				<Link to="/board">View Board</Link>
 			</form>
 		)
 	}

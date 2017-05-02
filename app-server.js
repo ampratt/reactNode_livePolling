@@ -71,11 +71,15 @@ io.sockets.on('connection', function (socket) {
 		results = {a:0, b:0, c:0,d:0};
 
 		io.sockets.emit('ask', currentQuestion);
+		// reset results when asking new question
+		io.sockets.emit('results', results);
 		console.log("Question Asked: '%s'", question.q);
 	});
 
 	socket.on('answer', function(payload) {
 		results[payload.choice]++;
+		// broadcast results graph to clients
+		io.sockets.emit('results', results);
 		console.log("Answer: '%s' - %j", payload.choice, results);
 	});
 
@@ -84,7 +88,8 @@ io.sockets.on('connection', function (socket) {
 		audience: audience,
 		speaker: speaker.name,
 		questions: questions,
-		currentQuestion: currentQuestion
+		currentQuestion: currentQuestion,
+		results: results
 	});
 
 	connections.push(socket);

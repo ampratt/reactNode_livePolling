@@ -14,7 +14,8 @@ const App = React.createClass({
 			audience: [],
 			speaker: '',
 			questions: [],
-			currentQuestion: false
+			currentQuestion: false,
+			results: {}
 		}
 	},
 
@@ -29,6 +30,7 @@ const App = React.createClass({
 		this.socket.on('start', this.startPresentation)
 		this.socket.on('end', this.updateState)
 		this.socket.on('ask', this.ask)
+		this.socket.on('results', this.updateResults)
 	},
 
 	// all outgoing data TO server comes through emit()
@@ -92,7 +94,14 @@ const App = React.createClass({
     ask(question) {
    	 	// clear any saved answers
     	sessionStorage.answer = ''
-        this.setState({ currentQuestion: question });
+        this.setState({ 
+        	currentQuestion: question,
+        	result: {a:0, b:0, c:0,d:0}
+    	})
+    },
+
+    updateResults(results) {
+    	this.setState({ results: results })
     },
 
 	render(){
