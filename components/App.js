@@ -12,7 +12,9 @@ const App = React.createClass({
 			title: '',
 			member: {},		// refers to current socket
 			audience: [],
-			speaker: ''
+			speaker: '',
+			questions: [],
+			currentQuestion: false
 		}
 	},
 
@@ -26,12 +28,13 @@ const App = React.createClass({
 		this.socket.on('audience', this.updateAudience)
 		this.socket.on('start', this.startPresentation)
 		this.socket.on('end', this.updateState)
+		this.socket.on('ask', this.ask)
 	},
 
 	// all outgoing data TO server comes through emit()
 	emit(eventName, payload) {
 		this.socket.emit(eventName, payload)
-		console.log("Person joined ", payload.name)
+		console.log("Emit event fired: '%s' with payload '%s'", eventName, payload.name)
 	},
 
 	connect() {
@@ -85,6 +88,12 @@ const App = React.createClass({
 		}
 		this.setState(presentation)
 	},
+
+    ask(question) {
+   	 	// clear any saved answers
+    	sessionStorage.answer = ''
+        this.setState({ currentQuestion: question });
+    },
 
 	render(){
 		// var children = React.Children.map(this.props.children, function (child) {
