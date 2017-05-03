@@ -1,16 +1,15 @@
 import React, { Component } from 'react'
-import ReactDOM from 'react-dom'
 
-const JoinSpeaker = React.createClass ({
+class JoinSpeaker extends Component {
 
-	start(e) {
+	start = (e) => {
 		let speakerName = this.refs.name.value
 		let title = this.refs.title.value
 		this.props.emit('start', { 
 			name: speakerName, 
 			title: title 
 		})
-	},
+	}
 
 	render() {
 		return (
@@ -33,6 +32,6 @@ const JoinSpeaker = React.createClass ({
 			</form>
 		)
 	}
-})
+}
 
 export default JoinSpeaker

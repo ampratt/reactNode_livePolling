@@ -69,3 +69,7 @@ form a {
 p.info-update {
     font-style: italic;
 }
+
+p.answer {
+    background-color: green;
+}

@@ -1,24 +1,27 @@
-import React from 'react'
+import React, { Component } from 'react'
 import Display from './Display'
 
-var Ask = React.createClass({
+class Answer extends Component {
 
-	getInitialState() {
-		return {
+	constructor(props) {
+		super(props)
+		this.state = {
 			choices: [],
 			answer: undefined
 		}
-	},
+		this.setUpChoices = this.setUpChoices.bind(this)
+		// this.selectAnswer = this.selectAnswer.bind(this)
+	}
 
 	componentWillMount() {
 		// fires on initial mount
 		this.setUpChoices()
-	},
+	}
 
 	componentWillReceiveProps() {
 		// fires whenever any props of component change
 		this.setUpChoices()
-	},
+	}
 
 	setUpChoices() {
 		// creates array of question object {q,a,b,c,d}
@@ -29,9 +32,9 @@ var Ask = React.createClass({
 			choices: choices,
 			answer: sessionStorage.answer
 		})
-	},
+	}
 
-	selectAnswer(choice, i) {
+	selectAnswer = (choice, i) => {
 		this.setState({ answer: choice })
 		// save for case of refresh, don't reshow buttons
 		sessionStorage.answer = choice
@@ -39,9 +42,9 @@ var Ask = React.createClass({
 			question: this.props.question,
 			choice: choice
 		})
-	},
+	}
 
-	addChoiceButton(choice, i) {
+	addChoiceButton = (choice, i) => {
 		// choice = a, b, c, d
 		let buttonTypes = ['primary', 'success', 'warning', 'danger']
 		return (
@@ -52,18 +55,40 @@ var Ask = React.createClass({
 				{choice}: {this.props.question[choice]}
 			</button>
 		)
-	},
+	}
+
+	styleAnswerPanel = (answer) => {
+		// let panelTypes = { a: 'primary', b: 'success', c:'warning', d: 'danger' }
+		switch (answer) {
+			case 'a':
+				return "info"
+				break
+			case 'b':
+				return "success"
+				break
+			case 'c':
+				return "warning"
+				break
+			case 'd':
+				return "danger"
+				break
+			default:
+				return "info"
+		}
+	}
 
 	render() {
 		return (
 			<div id="currentQuestion">
 				<Display if={this.state.answer}>
-					<h3>You answered: {this.state.answer}</h3>
-					<p>{this.props.question[this.state.answer]}</p>
+					<h3>You answered:</h3>
+
+					<div className={"col-xs-12 col-sm-6 alert alert-" + this.styleAnswerPanel(this.state.answer)} role="alert">
+						<b>{this.state.answer}:</b> {this.props.question[this.state.answer]}
+					</div>
 				</Display>
 
 				<Display if={!this.state.answer}>
-					<h2>{this.props.question.q}</h2>
 					<div className="row">
 						{this.state.choices.map(this.addChoiceButton)}
 					</div>			
@@ -72,6 +97,8 @@ var Ask = React.createClass({
 			</div>
 		)
 	}
-})
+}
 
-export default Ask
+export default Answer
+
+					// <h2>{this.props.question.q}</h2>

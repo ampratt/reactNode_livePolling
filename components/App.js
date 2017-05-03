@@ -1,13 +1,14 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { Router, RouteHandler } from 'react-router'
 import io from 'socket.io-client'
 import Header from './parts/Header'
 
 
-const App = React.createClass({
+class App extends Component {
 
-	getInitialState() {
-		return {
+	constructor(props) {
+		super(props)
+		this.state = {
 			status: 'disconnected',
 			title: '',
 			member: {},		// refers to current socket
@@ -17,7 +18,16 @@ const App = React.createClass({
 			currentQuestion: false,
 			results: {}
 		}
-	},
+		this.emit = this.emit.bind(this)
+		this.connect = this.connect.bind(this)
+		this.disconnect = this.disconnect.bind(this)
+		this.joined = this.joined.bind(this)
+		this.updateAudience = this.updateAudience.bind(this)
+		this.updateState = this.updateState.bind(this)
+		this.startPresentation = this.startPresentation.bind(this)
+		this.ask = this.ask.bind(this)
+		this.updateResults = this.updateResults.bind(this)
+	}
 
 	// all incoming data FROM server added to listeners
 	componentWillMount() {
@@ -31,13 +41,13 @@ const App = React.createClass({
 		this.socket.on('end', this.updateState)
 		this.socket.on('ask', this.ask)
 		this.socket.on('results', this.updateResults)
-	},
+	}
 
 	// all outgoing data TO server comes through emit()
 	emit(eventName, payload) {
 		this.socket.emit(eventName, payload)
 		console.log("Emit event fired: '%s' with payload '%s'", eventName, payload.name)
-	},
+	}
 
 	connect() {
 		// see if pre-existing person already exists in sessionStorage
@@ -53,24 +63,24 @@ const App = React.createClass({
 			})
 		}
 
-		console.log("Connected: " + this.socket.id)
+		// console.log("Connected: " + this.socket.id)
 		this.setState({
 			status: 'connected'
 		})
-	},
+	}
 
 	disconnect() {
-		console.log("Disconnected: " + this.socket.id)
+		// console.log("Disconnected: " + this.socket.id)
 		this.setState({
 			status: 'disconnected',
 			title: 'disconnected',
 			speaker: ''
 		}) 
-	},
+	}
 
 	updateState(serverState) {
 		this.setState(serverState)
-	},
+	}
 
 	joined(member) {
 		// save in local session to allow auto rejoin same member on browser refresh
@@ -78,31 +88,31 @@ const App = React.createClass({
 		this.setState({
 			member: member
 		})
-	},
+	}
 
 	updateAudience(newAudience) {
 		this.setState({ audience: newAudience })
-	},
+	}
 
 	startPresentation(presentation) {
 		if (this.state.member.type === 'speaker') {
 			sessionStorage.title = presentation.title
 		}
 		this.setState(presentation)
-	},
+	}
 
     ask(question) {
    	 	// clear any saved answers
     	sessionStorage.answer = ''
         this.setState({ 
         	currentQuestion: question,
-        	result: {a:0, b:0, c:0,d:0}
+        	results: { a:0, b:0, c:0,d:0 }
     	})
-    },
+    }
 
     updateResults(results) {
     	this.setState({ results: results })
-    },
+    }
 
 	render(){
 		// var children = React.Children.map(this.props.children, function (child) {
@@ -124,7 +134,6 @@ const App = React.createClass({
 			</div>
 		)
 	}
-})
+}
 
 export default App
-// module.exports = App

@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import Display from './parts/Display'
 import { BarChart } from 'react-d3'
-// import PropTypes from 'prop-types';
 
 class Board extends Component {
 	

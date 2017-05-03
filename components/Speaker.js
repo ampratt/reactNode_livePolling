@@ -3,6 +3,7 @@ import Display from './parts/Display'
 import JoinSpeaker from './parts/JoinSpeaker'
 import Attendance from './parts/Attendance'
 import Questions from './parts/Questions'
+import Results from "./parts/Results"
 
 class Speaker extends Component {
 	render() {
@@ -13,6 +14,13 @@ class Speaker extends Component {
 					<Display if={this.props.member.name && this.props.member.type === 'speaker'}>
 						<Questions questions={this.props.questions} 
 									emit={this.props.emit} />
+						{(this.props.currentQuestion) ? 
+							<Results results={this.props.results} 
+										title={"Audience reponses:"}
+										height={window.innerHeight * 0.4}
+										width={window.innerWidth * 0.7}
+							/>
+							: null}
 						<Attendance audience={this.props.audience} />
 					</Display>
 

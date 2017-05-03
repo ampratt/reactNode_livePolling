@@ -1,14 +1,14 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router'
 
-const Join = React.createClass ({
+class Join extends Component {
 
-	join(e) {
+	join = (e) => {
 		let member = {
 			memberName: this.refs.name.value	//React.findDOMNode(this.refs.name).value
 		}
 		this.props.emit('join', { name: member.memberName })
-	},
+	}
 
 	render() {
 		return (
@@ -25,6 +25,6 @@ const Join = React.createClass ({
 			</form>
 		)
 	}
-})
+}
 
 export default Join

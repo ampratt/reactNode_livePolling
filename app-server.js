@@ -72,7 +72,7 @@ io.sockets.on('connection', function (socket) {
 
 		io.sockets.emit('ask', currentQuestion);
 		// reset results when asking new question
-		io.sockets.emit('results', results);
+		// io.sockets.emit('results', results);
 		console.log("Question Asked: '%s'", question.q);
 	});
 

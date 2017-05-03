@@ -1,11 +1,6 @@
 import React from 'react'
 import ReactDOM, { render } from 'react-dom'
-import { Router, browserHistory } from 'react-router'
 import createRoutes from './components/routes'
-import App from './components/App'
-import Audience from './components/Audience'
-import Speaker from './components/Speaker'
-import Board from './components/Board'
 // first JS file to run in browser
 
 const routes = createRoutes();

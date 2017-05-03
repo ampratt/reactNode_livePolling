@@ -1,18 +1,18 @@
 import React, { Component } from 'react'
 
-var Questions = React.createClass({
+class Questions extends Component {
 
-	ask(question) {
+	ask = (question) => {
 		this.props.emit('ask', question)
-	},
+	}
 
-	addQuestion(question, i) {
+	addQuestion = (question, i) => {
 		return (
 			<div key={i} className="col-xs-12 col-sm-6 col-md-3">
 				<span onClick={this.ask.bind(null, question)}>{question.q}</span>
 			</div>
 		)
-	},
+	}
 
 	render() {
 		return (
@@ -22,6 +22,6 @@ var Questions = React.createClass({
 			</div>
 		)
 	}
-})
+}
 
 export default Questions
